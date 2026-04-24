@@ -1,4 +1,4 @@
-package com.quantity;
+package com.quantity.length;
 
 public enum LengthUnit {
 
