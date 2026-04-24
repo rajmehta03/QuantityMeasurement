@@ -6,36 +6,23 @@ class QuantityMeasurementAppTest {
     private static final double EPS = 1e-6;
 
     @Test
-    void testAddition_SameUnit_FeetPlusFeet() {
+    void testAddition_ExplicitTargetUnit_Feet() {
+        var result = QuantityMeasurementApp.QuantityLength.add(
+                new QuantityMeasurementApp.QuantityLength(1.0,
+                        QuantityMeasurementApp.LengthUnit.FEET),
+                new QuantityMeasurementApp.QuantityLength(12.0,
+                        QuantityMeasurementApp.LengthUnit.INCH),
+                QuantityMeasurementApp.LengthUnit.FEET);
+
+        assertEquals(2.0, result.convertTo(
+                QuantityMeasurementApp.LengthUnit.FEET).value, EPS);
+    }
+
+    @Test
+    void testAddition_ExplicitTargetUnit_Inches() {
         var result = QuantityMeasurementApp.QuantityLength.add(
                 1.0, QuantityMeasurementApp.LengthUnit.FEET,
-                2.0, QuantityMeasurementApp.LengthUnit.FEET,
-                QuantityMeasurementApp.LengthUnit.FEET);
-
-        assertEquals(3.0, result.convertTo(
-                QuantityMeasurementApp.LengthUnit.FEET).toString().contains("3.0") ? 3.0 : 0.0, EPS);
-    }
-
-    @Test
-    void testAddition_CrossUnit_FeetPlusInches() {
-        var q1 = new QuantityMeasurementApp.QuantityLength(1.0,
-                QuantityMeasurementApp.LengthUnit.FEET);
-
-        var q2 = new QuantityMeasurementApp.QuantityLength(12.0,
-                QuantityMeasurementApp.LengthUnit.INCH);
-
-        var result = q1.add(q2);
-
-        assertTrue(result.equals(
-                new QuantityMeasurementApp.QuantityLength(2.0,
-                        QuantityMeasurementApp.LengthUnit.FEET)));
-    }
-
-    @Test
-    void testAddition_CrossUnit_InchPlusFeet() {
-        var result = QuantityMeasurementApp.QuantityLength.add(
                 12.0, QuantityMeasurementApp.LengthUnit.INCH,
-                1.0, QuantityMeasurementApp.LengthUnit.FEET,
                 QuantityMeasurementApp.LengthUnit.INCH);
 
         assertEquals(24.0,
@@ -44,69 +31,64 @@ class QuantityMeasurementAppTest {
     }
 
     @Test
-    void testAddition_Commutativity() {
+    void testAddition_ExplicitTargetUnit_Yards() {
+        var result = QuantityMeasurementApp.QuantityLength.add(
+                1.0, QuantityMeasurementApp.LengthUnit.FEET,
+                12.0, QuantityMeasurementApp.LengthUnit.INCH,
+                QuantityMeasurementApp.LengthUnit.YARD);
+
+        assertEquals(0.666666,
+                result.convertTo(QuantityMeasurementApp.LengthUnit.YARD).value,
+                1e-3);
+    }
+
+    @Test
+    void testAddition_ExplicitTargetUnit_Commutativity() {
         var a = new QuantityMeasurementApp.QuantityLength(1.0,
                 QuantityMeasurementApp.LengthUnit.FEET);
 
         var b = new QuantityMeasurementApp.QuantityLength(12.0,
                 QuantityMeasurementApp.LengthUnit.INCH);
 
-        assertTrue(a.add(b).equals(b.add(a)));
+        var r1 = QuantityMeasurementApp.QuantityLength.add(a, b,
+                QuantityMeasurementApp.LengthUnit.YARD);
+
+        var r2 = QuantityMeasurementApp.QuantityLength.add(b, a,
+                QuantityMeasurementApp.LengthUnit.YARD);
+
+        assertTrue(r1.equals(r2));
     }
 
     @Test
-    void testAddition_WithZero() {
+    void testAddition_ExplicitTargetUnit_NullTarget() {
+        assertThrows(IllegalArgumentException.class, () ->
+                QuantityMeasurementApp.QuantityLength.add(
+                        1.0, QuantityMeasurementApp.LengthUnit.FEET,
+                        12.0, QuantityMeasurementApp.LengthUnit.INCH,
+                        null));
+    }
+
+    @Test
+    void testAddition_ExplicitTargetUnit_WithZero() {
         var result = QuantityMeasurementApp.QuantityLength.add(
                 5.0, QuantityMeasurementApp.LengthUnit.FEET,
                 0.0, QuantityMeasurementApp.LengthUnit.INCH,
-                QuantityMeasurementApp.LengthUnit.FEET);
+                QuantityMeasurementApp.LengthUnit.YARD);
 
-        assertEquals(5.0,
-                result.convertTo(QuantityMeasurementApp.LengthUnit.FEET).value,
-                EPS);
+        assertEquals(1.666666,
+                result.convertTo(QuantityMeasurementApp.LengthUnit.YARD).value,
+                1e-3);
     }
 
     @Test
-    void testAddition_NegativeValues() {
+    void testAddition_ExplicitTargetUnit_Negative() {
         var result = QuantityMeasurementApp.QuantityLength.add(
                 5.0, QuantityMeasurementApp.LengthUnit.FEET,
                 -2.0, QuantityMeasurementApp.LengthUnit.FEET,
-                QuantityMeasurementApp.LengthUnit.FEET);
+                QuantityMeasurementApp.LengthUnit.INCH);
 
-        assertEquals(3.0,
-                result.convertTo(QuantityMeasurementApp.LengthUnit.FEET).value,
-                EPS);
-    }
-
-    @Test
-    void testAddition_NullSecondOperand() {
-        var q = new QuantityMeasurementApp.QuantityLength(1.0,
-                QuantityMeasurementApp.LengthUnit.FEET);
-
-        assertThrows(IllegalArgumentException.class, () -> q.add(null));
-    }
-
-    @Test
-    void testAddition_LargeValues() {
-        var result = QuantityMeasurementApp.QuantityLength.add(
-                1e6, QuantityMeasurementApp.LengthUnit.FEET,
-                1e6, QuantityMeasurementApp.LengthUnit.FEET,
-                QuantityMeasurementApp.LengthUnit.FEET);
-
-        assertEquals(2e6,
-                result.convertTo(QuantityMeasurementApp.LengthUnit.FEET).value,
-                EPS);
-    }
-
-    @Test
-    void testAddition_SmallValues() {
-        var result = QuantityMeasurementApp.QuantityLength.add(
-                0.001, QuantityMeasurementApp.LengthUnit.FEET,
-                0.002, QuantityMeasurementApp.LengthUnit.FEET,
-                QuantityMeasurementApp.LengthUnit.FEET);
-
-        assertEquals(0.003,
-                result.convertTo(QuantityMeasurementApp.LengthUnit.FEET).value,
+        assertEquals(36.0,
+                result.convertTo(QuantityMeasurementApp.LengthUnit.INCH).value,
                 EPS);
     }
 }

@@ -1,5 +1,5 @@
 /**
- * UC6: Addition of Length Units with conversion support
+ * UC7: Addition with explicit target unit specification
  */
 public class QuantityMeasurementApp {
 
@@ -37,45 +37,50 @@ public class QuantityMeasurementApp {
         }
 
         private static void validate(double value, LengthUnit unit) {
-            if (unit == null) throw new IllegalArgumentException("Unit cannot be null");
-            if (!Double.isFinite(value)) throw new IllegalArgumentException("Invalid value");
+            if (unit == null) {
+                throw new IllegalArgumentException("Unit cannot be null");
+            }
+            if (!Double.isFinite(value)) {
+                throw new IllegalArgumentException("Value must be finite");
+            }
         }
 
         private double toFeet() {
             return unit.toFeet(value);
         }
 
-        // ===== ADD (Instance Method) =====
-        public QuantityLength add(QuantityLength other) {
-            if (other == null) {
-                throw new IllegalArgumentException("Other quantity cannot be null");
-            }
-
-            // Normalize to base (feet)
-            double sumFeet = this.toFeet() + other.toFeet();
-
-            // Convert back to THIS unit
-            double result = this.unit.fromFeet(sumFeet);
-
-            return new QuantityLength(result, this.unit);
+        // ===== PRIVATE UTILITY (DRY CORE LOGIC) =====
+        private static double addInFeet(QuantityLength q1, QuantityLength q2) {
+            return q1.toFeet() + q2.toFeet();
         }
 
-        // ===== STATIC ADD (Flexible API) =====
+        // ===== UC6 (DEFAULT: FIRST OPERAND UNIT) =====
+        public QuantityLength add(QuantityLength other) {
+            if (other == null) {
+                throw new IllegalArgumentException("Other cannot be null");
+            }
+            return add(this, other, this.unit);
+        }
+
+        // ===== UC7 (EXPLICIT TARGET UNIT) =====
         public static QuantityLength add(QuantityLength q1,
                                          QuantityLength q2,
                                          LengthUnit targetUnit) {
 
-            if (q1 == null || q2 == null || targetUnit == null) {
-                throw new IllegalArgumentException("Inputs cannot be null");
+            if (q1 == null || q2 == null) {
+                throw new IllegalArgumentException("Operands cannot be null");
+            }
+            if (targetUnit == null) {
+                throw new IllegalArgumentException("Target unit cannot be null");
             }
 
-            double sumFeet = q1.toFeet() + q2.toFeet();
+            double sumFeet = addInFeet(q1, q2);
             double result = targetUnit.fromFeet(sumFeet);
 
             return new QuantityLength(result, targetUnit);
         }
 
-        // ===== OVERLOADED ADD =====
+        // ===== OVERLOADED VERSION =====
         public static QuantityLength add(double v1, LengthUnit u1,
                                          double v2, LengthUnit u2,
                                          LengthUnit targetUnit) {
@@ -114,17 +119,14 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // ===== MAIN DEMO =====
+    // ===== DEMO =====
     public static void main(String[] args) {
 
-        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength f = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength i = new QuantityLength(12.0, LengthUnit.INCH);
 
-        System.out.println(q1.add(q2)); // 2 feet
-
-        System.out.println(QuantityLength.add(
-                new QuantityLength(1.0, LengthUnit.YARD),
-                new QuantityLength(3.0, LengthUnit.FEET),
-                LengthUnit.YARD)); // 2 yards
+        System.out.println(QuantityLength.add(f, i, LengthUnit.FEET));   // 2 FEET
+        System.out.println(QuantityLength.add(f, i, LengthUnit.INCH));   // 24 INCH
+        System.out.println(QuantityLength.add(f, i, LengthUnit.YARD));   // ~0.667 YARD
     }
 }
