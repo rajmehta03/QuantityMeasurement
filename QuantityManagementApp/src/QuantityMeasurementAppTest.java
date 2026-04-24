@@ -3,82 +3,138 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class QuantityMeasurementAppTest {
 
-    // Same Unit Equality
+    // ===== YARD TESTS =====
     @Test
-    void testEquality_FeetToFeet_SameValue() {
+    void testEquality_YardToYard_SameValue() {
         assertTrue(QuantityMeasurementApp.compare(1.0,
-                QuantityMeasurementApp.LengthUnit.FEET,
+                QuantityMeasurementApp.LengthUnit.YARD,
                 1.0,
-                QuantityMeasurementApp.LengthUnit.FEET));
+                QuantityMeasurementApp.LengthUnit.YARD));
     }
 
     @Test
-    void testEquality_InchToInch_SameValue() {
-        assertTrue(QuantityMeasurementApp.compare(1.0,
-                QuantityMeasurementApp.LengthUnit.INCH,
-                1.0,
-                QuantityMeasurementApp.LengthUnit.INCH));
-    }
-
-    // Cross Unit Equality
-    @Test
-    void testEquality_FeetToInch_EquivalentValue() {
-        assertTrue(QuantityMeasurementApp.compare(1.0,
-                QuantityMeasurementApp.LengthUnit.FEET,
-                12.0,
-                QuantityMeasurementApp.LengthUnit.INCH));
-    }
-
-    @Test
-    void testEquality_InchToFeet_EquivalentValue() {
-        assertTrue(QuantityMeasurementApp.compare(12.0,
-                QuantityMeasurementApp.LengthUnit.INCH,
-                1.0,
-                QuantityMeasurementApp.LengthUnit.FEET));
-    }
-
-    // Different Values
-    @Test
-    void testEquality_FeetToFeet_DifferentValue() {
+    void testEquality_YardToYard_DifferentValue() {
         assertFalse(QuantityMeasurementApp.compare(1.0,
+                QuantityMeasurementApp.LengthUnit.YARD,
+                2.0,
+                QuantityMeasurementApp.LengthUnit.YARD));
+    }
+
+    @Test
+    void testEquality_YardToFeet_EquivalentValue() {
+        assertTrue(QuantityMeasurementApp.compare(1.0,
+                QuantityMeasurementApp.LengthUnit.YARD,
+                3.0,
+                QuantityMeasurementApp.LengthUnit.FEET));
+    }
+
+    @Test
+    void testEquality_FeetToYard_EquivalentValue() {
+        assertTrue(QuantityMeasurementApp.compare(3.0,
                 QuantityMeasurementApp.LengthUnit.FEET,
+                1.0,
+                QuantityMeasurementApp.LengthUnit.YARD));
+    }
+
+    @Test
+    void testEquality_YardToInches_EquivalentValue() {
+        assertTrue(QuantityMeasurementApp.compare(1.0,
+                QuantityMeasurementApp.LengthUnit.YARD,
+                36.0,
+                QuantityMeasurementApp.LengthUnit.INCH));
+    }
+
+    @Test
+    void testEquality_YardToFeet_NonEquivalentValue() {
+        assertFalse(QuantityMeasurementApp.compare(1.0,
+                QuantityMeasurementApp.LengthUnit.YARD,
                 2.0,
                 QuantityMeasurementApp.LengthUnit.FEET));
     }
 
+    // ===== CENTIMETER TESTS =====
     @Test
-    void testEquality_InchToInch_DifferentValue() {
-        assertFalse(QuantityMeasurementApp.compare(1.0,
-                QuantityMeasurementApp.LengthUnit.INCH,
+    void testEquality_CentimeterToCentimeter_SameValue() {
+        assertTrue(QuantityMeasurementApp.compare(2.0,
+                QuantityMeasurementApp.LengthUnit.CENTIMETER,
                 2.0,
+                QuantityMeasurementApp.LengthUnit.CENTIMETER));
+    }
+
+    @Test
+    void testEquality_CentimeterToInch_EquivalentValue() {
+        assertTrue(QuantityMeasurementApp.compare(1.0,
+                QuantityMeasurementApp.LengthUnit.CENTIMETER,
+                0.393701,
                 QuantityMeasurementApp.LengthUnit.INCH));
     }
 
-    // Null Handling
     @Test
-    void testEquality_NullComparison() {
-        QuantityMeasurementApp.QuantityLength q =
-                new QuantityMeasurementApp.QuantityLength(1.0,
-                        QuantityMeasurementApp.LengthUnit.FEET);
-
-        assertFalse(q.equals(null));
+    void testEquality_CentimeterToFeet_NonEquivalentValue() {
+        assertFalse(QuantityMeasurementApp.compare(1.0,
+                QuantityMeasurementApp.LengthUnit.CENTIMETER,
+                1.0,
+                QuantityMeasurementApp.LengthUnit.FEET));
     }
 
-    // Same Reference
+    // ===== TRANSITIVE PROPERTY =====
+    @Test
+    void testEquality_MultiUnit_TransitiveProperty() {
+        boolean aEqualsB = QuantityMeasurementApp.compare(1.0,
+                QuantityMeasurementApp.LengthUnit.YARD,
+                3.0,
+                QuantityMeasurementApp.LengthUnit.FEET);
+
+        boolean bEqualsC = QuantityMeasurementApp.compare(3.0,
+                QuantityMeasurementApp.LengthUnit.FEET,
+                36.0,
+                QuantityMeasurementApp.LengthUnit.INCH);
+
+        boolean aEqualsC = QuantityMeasurementApp.compare(1.0,
+                QuantityMeasurementApp.LengthUnit.YARD,
+                36.0,
+                QuantityMeasurementApp.LengthUnit.INCH);
+
+        assertTrue(aEqualsB && bEqualsC && aEqualsC);
+    }
+
+    // ===== NULL + SAFETY =====
+    @Test
+    void testEquality_NullUnit() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new QuantityMeasurementApp.QuantityLength(1.0, null);
+        });
+    }
+
     @Test
     void testEquality_SameReference() {
         QuantityMeasurementApp.QuantityLength q =
                 new QuantityMeasurementApp.QuantityLength(1.0,
-                        QuantityMeasurementApp.LengthUnit.FEET);
+                        QuantityMeasurementApp.LengthUnit.YARD);
 
         assertTrue(q.equals(q));
     }
 
-    // Invalid Unit
     @Test
-    void testEquality_InvalidUnit() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new QuantityMeasurementApp.QuantityLength(1.0, null);
-        });
+    void testEquality_NullComparison() {
+        QuantityMeasurementApp.QuantityLength q =
+                new QuantityMeasurementApp.QuantityLength(1.0,
+                        QuantityMeasurementApp.LengthUnit.YARD);
+
+        assertFalse(q.equals(null));
+    }
+
+    // ===== COMPLEX SCENARIO =====
+    @Test
+    void testEquality_AllUnits_ComplexScenario() {
+        assertTrue(QuantityMeasurementApp.compare(2.0,
+                QuantityMeasurementApp.LengthUnit.YARD,
+                6.0,
+                QuantityMeasurementApp.LengthUnit.FEET));
+
+        assertTrue(QuantityMeasurementApp.compare(6.0,
+                QuantityMeasurementApp.LengthUnit.FEET,
+                72.0,
+                QuantityMeasurementApp.LengthUnit.INCH));
     }
 }
