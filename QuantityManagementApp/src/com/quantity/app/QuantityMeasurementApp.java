@@ -1,4 +1,7 @@
-package com.quantity;
+package com.quantity.app;
+
+import com.quantity.length.LengthUnit;
+import com.quantity.length.QuantityLength;
 
 public class QuantityMeasurementApp {
 
