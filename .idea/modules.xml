@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/QuantityManagementApp/QuantityManagementApp.iml" filepath="$PROJECT_DIR$/QuantityManagementApp/QuantityManagementApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/RA2411003011296(QuantityMeasurementApp).iml" filepath="$PROJECT_DIR$/.idea/RA2411003011296(QuantityMeasurementApp).iml" />
+    </modules>
+  </component>
+</project>
